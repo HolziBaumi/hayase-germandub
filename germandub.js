@@ -12,7 +12,23 @@ export default new class GermanDub {
   subOnly = /\bger(man)?[\s._-]*sub/i
   stop = new Set(['the', 'and', 'for', 'with', 'from', 'season', 'part', 'movie', 'film'])
 
-  async single({ titles, episode, resolution }) {
+  // DEBUG: true = bei leerem Ergebnis zeigt Hayase eine Fehlermeldung mit Details.
+  // Wenn alles läuft, auf false setzen.
+  debug = true
+
+  check(mode, query, raw, out) {
+    if (this.debug && !out.length) {
+      throw new Error(
+        `[GerDub-Debug] ${mode}: Feed-Treffer=${raw.length}, nach Filter=0, ` +
+        `Episode=${query.episode}, Titel=${JSON.stringify(query.titles)}, ` +
+        `Felder=${Object.keys(query || {}).join(',')}`
+      )
+    }
+    return out
+  }
+
+  async single(query) {
+    const { titles, episode, resolution } = query
     const raw = await this.searchAll(titles, episode, resolution)
     const out = []
     for (const r of raw) {
@@ -20,20 +36,24 @@ export default new class GermanDub {
       if (episode == null || this.hasEpisode(r.title, episode)) out.push(r)
       else if (this.isBatch(r.title)) out.push({ ...r, type: 'batch', accuracy: 'low' })
     }
-    return this.dedupe(out)
+    return this.check('single', query, raw, this.dedupe(out))
   }
 
-  async batch({ titles, resolution }) {
+  async batch(query) {
+    const { titles, resolution } = query
     const raw = await this.searchAll(titles, null, resolution)
-    return this.dedupe(
+    const out = this.dedupe(
       raw.filter(r => this.matchesShow(r.title, titles) && this.isBatch(r.title))
          .map(r => ({ ...r, type: 'batch', accuracy: 'low' }))
     )
+    return this.check('batch', query, raw, out)
   }
 
-  async movie({ titles, resolution }) {
+  async movie(query) {
+    const { titles, resolution } = query
     const raw = await this.searchAll(titles, null, resolution)
-    return this.dedupe(raw.filter(r => this.matchesShow(r.title, titles)))
+    const out = this.dedupe(raw.filter(r => this.matchesShow(r.title, titles)))
+    return this.check('movie', query, raw, out)
   }
 
   async searchAll(titles, episode, resolution) {
