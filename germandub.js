@@ -38,27 +38,42 @@ export default new class GermanDub {
 
   async searchAll(titles, episode, resolution) {
     if (!titles?.length) return []
-    const results = []
+    const queries = []
     for (const title of titles.slice(0, 2)) {
-      results.push(...await this.search(title, episode, resolution))
+      const clean = this.clean(title)
+      if (!clean) continue
+      // 1) breit: Serientitel + deutsche Schlagwörter, Filterung passiert danach lokal
+      queries.push(`${clean} (german|ger|deutsch)`)
+      // 2) mit Folgennummer, falls vorhanden
+      if (episode != null) queries.push(`${clean} ${String(episode).padStart(2, '0')} (german|ger|deutsch)`)
     }
+    const settled = await Promise.allSettled([...new Set(queries)].map(q => this.fetchFeed(q)))
+    const results = []
+    let lastError = null
+    for (const s of settled) {
+      if (s.status === 'fulfilled') results.push(...s.value)
+      else lastError = s.reason
+    }
+    if (!results.length && lastError && settled.every(s => s.status === 'rejected')) throw lastError
     return results
   }
 
-  async search(title, episode, resolution) {
-    const clean = title.replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ').trim()
-    let query = clean
-    if (episode != null) query += ` ${String(episode).padStart(2, '0')}`
-    query += ' (german|ger|deutsch)'
-    if (resolution) query += ` ${resolution}`
+  clean(title) {
+    const base = String(title || '').split(':')[0]
+    return base.replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ').trim()
+  }
 
+  async fetchFeed(query) {
+    let res
     try {
-      const res = await fetch(this.base + encodeURIComponent(query))
-      if (!res.ok) return []
-      return this.parse(await res.text())
+      res = await fetch(this.base + encodeURIComponent(query))
     } catch (e) {
-      return []
+      throw new Error('nyaa.si ist gerade nicht erreichbar.')
     }
+    if (!res.ok) throw new Error('nyaa.si antwortet mit HTTP ' + res.status)
+    const text = await res.text()
+    if (!text.includes('<item>')) return []
+    return this.parse(text)
   }
 
   parse(xml) {
@@ -93,14 +108,16 @@ export default new class GermanDub {
   matchesShow(title, titles) {
     if (!titles?.length) return true
     const lower = title.toLowerCase()
+    let usable = 0
     for (const t of titles) {
       const tokens = t.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').split(/\s+/)
         .filter(w => w.length >= 3 && !this.stop.has(w))
       if (!tokens.length) continue
+      usable++
       const hits = tokens.filter(w => lower.includes(w)).length
       if (hits >= Math.ceil(tokens.length * 0.6)) return true
     }
-    return false
+    return usable === 0
   }
 
   hasEpisode(title, ep) {
