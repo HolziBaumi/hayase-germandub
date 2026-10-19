@@ -2,17 +2,20 @@
   {
     "manifestVersion": 2,
     "name": "German Dub (Nyaa)",
+    "author": "HolzI_Baumi",
     "id": "community.extension.germandub",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "type": "torrent",
     "accuracy": "medium",
     "updatePeers": false,
     "ratio": 0,
     "media": "dub",
-    "languages": ["DE"],
+    "languages": [
+      "DE"
+    ],
     "nsfw": false,
     "url": "aHR0cHM6Ly9ueWFhLnNp",
-    "description": "Deutsche Synchro (German Dub) über nyaa.si. Filtert Releases mit GerDub, German Dub, Deutsch oder Dual Audio.",
+    "description": "Deutsche Synchro (German Dub) über nyaa.si. Filtert Releases mit GerDub, German Dub, Deutsch oder Dual Audio. Autor: HolzI_Baumi",
     "icon": "https://nyaa.si/static/favicon.png",
     "update": "https://raw.githubusercontent.com/HolziBaumi/hayase-germandub/main/index.json",
     "code": "https://raw.githubusercontent.com/HolziBaumi/hayase-germandub/main/germandub.js"
