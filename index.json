@@ -1,0 +1,16 @@
+[
+  {
+    "id": "community.extension.germandub",
+    "name": "German Dub (Nyaa)",
+    "version": "1.0.0",
+    "type": "torrent",
+    "accuracy": "medium",
+    "ratio": 0,
+    "media": "dub",
+    "languages": ["de"],
+    "nsfw": false,
+    "icon": "https://nyaa.si/static/favicon.png",
+    "update": "https://raw.githubusercontent.com/DEIN-USERNAME/DEIN-REPO/main/index.json",
+    "code": "https://raw.githubusercontent.com/DEIN-USERNAME/DEIN-REPO/main/germandub.js"
+  }
+]
