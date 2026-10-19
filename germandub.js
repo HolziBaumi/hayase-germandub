@@ -122,7 +122,7 @@ export default new class GermanDub {
       if (!hash) continue
 
       out.push({
-        title,
+        title: this.label(title),
         link: this.magnet(hash, title),
         hash,
         seeders: Number(tag(item, 'nyaa:seeders')) || 0,
@@ -135,6 +135,14 @@ export default new class GermanDub {
       })
     }
     return out
+  }
+
+  // Hayase zeigt über dem Titel den Release-Gruppennamen an (z. B. "IK", "Judas").
+  // Hat der Titel keine erkennbare Gruppe, setzen wir [GerDub] davor, sonst stünde dort "No Group".
+  label(title) {
+    const hasLeadingGroup = /^\s*[\[(【][^\])】]+[\])】]/.test(title)
+    const hasTrailingGroup = /-[A-Za-z0-9]{2,}(?:\.[a-z0-9]{2,4})?\s*$/.test(title)
+    return hasLeadingGroup || hasTrailingGroup ? title : `[GerDub] ${title}`
   }
 
   // Gehört der Torrent überhaupt zur gesuchten Serie?
