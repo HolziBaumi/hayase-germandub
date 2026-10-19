@@ -10,7 +10,7 @@
     "languages": ["de"],
     "nsfw": false,
     "icon": "https://nyaa.si/static/favicon.png",
-    "update": "https://raw.githubusercontent.com/DEIN-USERNAME/DEIN-REPO/main/index.json",
-    "code": "https://raw.githubusercontent.com/DEIN-USERNAME/DEIN-REPO/main/germandub.js"
+    "update": "https://raw.githubusercontent.com/HolziBaumi/hayase-germandub/main/index.json",
+    "code": "https://raw.githubusercontent.com/HolziBaumi/hayase-germandub/main/germandub.js"
   }
 ]
