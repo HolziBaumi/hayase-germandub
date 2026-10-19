@@ -58,7 +58,7 @@ export default new class GermanDub {
 
       out.push({
         title,
-        link: hash, // Hayase akzeptiert Hash oder Magnet/Torrent-Link
+        link: this.magnet(hash, title),
         hash,
         seeders: Number(tag(item, 'nyaa:seeders')) || 0,
         leechers: Number(tag(item, 'nyaa:leechers')) || 0,
@@ -70,6 +70,17 @@ export default new class GermanDub {
       })
     }
     return out
+  }
+
+  magnet(hash, name) {
+    const trackers = [
+      'udp://tracker.opentrackr.org:1337/announce',
+      'udp://open.stealth.si:80/announce',
+      'udp://tracker.torrent.eu.org:451/announce',
+      'udp://exodus.desync.com:6969/announce',
+      'http://nyaa.tracker.wf:7777/announce'
+    ].map(t => 'tr=' + encodeURIComponent(t)).join('&')
+    return `magnet:?xt=urn:btih:${hash}&dn=${encodeURIComponent(name)}&${trackers}`
   }
 
   toBytes(str) {
@@ -86,6 +97,7 @@ export default new class GermanDub {
 
   async test() {
     const res = await fetch(this.base + 'one%20piece%20german')
-    return res.ok
+    if (!res.ok) throw new Error('nyaa.si antwortet mit HTTP ' + res.status)
+    return true
   }
 }()
