@@ -38,23 +38,34 @@ export default new class GermanDub {
 
   async searchAll(titles, episode, resolution) {
     if (!titles?.length) return []
-    const queries = []
+    const results = []
+    let lastError = null
+
+    // Gibt false zurück, wenn Nyaa bremst (429) -> dann keine weiteren Anfragen
+    const run = async q => {
+      try {
+        results.push(...await this.fetchFeed(q))
+      } catch (e) {
+        lastError = e
+        if (e.rateLimited) return false
+      }
+      return true
+    }
+    const good = () => results.some(r =>
+      this.matchesShow(r.title, titles) &&
+      (episode == null || this.hasEpisode(r.title, episode) || this.isBatch(r.title)))
+
+    // Anfragen nacheinander und sparsam, damit Nyaa nicht blockiert
     for (const title of titles.slice(0, 2)) {
       const clean = this.clean(title)
       if (!clean) continue
-      // 1) breit: Serientitel + deutsche Schlagwörter, Filterung passiert danach lokal
-      queries.push(`${clean} (german|ger|deutsch)`)
-      // 2) mit Folgennummer, falls vorhanden
-      if (episode != null) queries.push(`${clean} ${String(episode).padStart(2, '0')} (german|ger|deutsch)`)
+      if (!await run(`${clean} (german|ger|deutsch)`)) break
+      if (episode != null && !good()) {
+        if (!await run(`${clean} ${String(episode).padStart(2, '0')} (german|ger|deutsch)`)) break
+      }
+      if (good()) break
     }
-    const settled = await Promise.allSettled([...new Set(queries)].map(q => this.fetchFeed(q)))
-    const results = []
-    let lastError = null
-    for (const s of settled) {
-      if (s.status === 'fulfilled') results.push(...s.value)
-      else lastError = s.reason
-    }
-    if (!results.length && lastError && settled.every(s => s.status === 'rejected')) throw lastError
+    if (!results.length && lastError) throw lastError
     return results
   }
 
@@ -63,17 +74,39 @@ export default new class GermanDub {
     return base.replace(/[^\p{L}\p{N}\s-]/gu, ' ').replace(/\s+/g, ' ').trim()
   }
 
+  cache = new Map()
+  delays = [1500, 3500, 7000]
+
   async fetchFeed(query) {
-    let res
-    try {
-      res = await fetch(this.base + encodeURIComponent(query))
-    } catch (e) {
-      throw new Error('nyaa.si ist gerade nicht erreichbar.')
+    const hit = this.cache.get(query)
+    if (hit && Date.now() - hit.time < 5 * 60 * 1000) return hit.items
+
+    for (let attempt = 0; ; attempt++) {
+      let res
+      try {
+        res = await fetch(this.base + encodeURIComponent(query), {
+          headers: { Accept: 'application/xml, text/xml, */*' }
+        })
+      } catch (e) {
+        throw new Error('nyaa.si ist gerade nicht erreichbar.')
+      }
+
+      if (res.status === 429) {
+        if (attempt >= this.delays.length) {
+          const err = new Error('nyaa.si bremst gerade zu viele Anfragen (HTTP 429). Kurz warten (ca. 1 Minute) und die Folge erneut öffnen.')
+          err.rateLimited = true
+          throw err
+        }
+        await new Promise(r => setTimeout(r, this.delays[attempt] + Math.floor(Math.random() * 400)))
+        continue
+      }
+      if (!res.ok) throw new Error('nyaa.si antwortet mit HTTP ' + res.status)
+
+      const text = await res.text()
+      const items = text.includes('<item>') ? this.parse(text) : []
+      this.cache.set(query, { time: Date.now(), items })
+      return items
     }
-    if (!res.ok) throw new Error('nyaa.si antwortet mit HTTP ' + res.status)
-    const text = await res.text()
-    if (!text.includes('<item>')) return []
-    return this.parse(text)
   }
 
   parse(xml) {
