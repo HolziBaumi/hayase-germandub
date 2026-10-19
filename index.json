@@ -2,9 +2,9 @@
   {
     "manifestVersion": 2,
     "name": "German Dub (Nyaa)",
-    "author": "HolzI_Baumi",
+    "author": "Holzi_Baumi",
     "id": "community.extension.germandub",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "type": "torrent",
     "accuracy": "medium",
     "updatePeers": false,
