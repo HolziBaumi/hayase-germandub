@@ -61,7 +61,7 @@ Hayase prüft beim Start automatisch, ob es eine neuere Version gibt. Nach einem
 
 ### Für Entwickler
 
-In `germandub.js` gibt es den Schalter `debug = true`. Solange er an ist, zeigt Hayase bei einem leeren Ergebnis eine Fehlermeldung mit Details (Anzahl der Feed-Treffer, Folge, übergebene Titel). Für den normalen Betrieb auf `debug = false` setzen.
+In `germandub.js` gibt es den Schalter `debug = true`. Solange er an ist, zeigt Hayase eine Fehlermeldung mit Details (Anzahl der Feed-Treffer, Folge, übergebene Titel), wenn Nyaa zwar deutsche Treffer liefert, aber alle herausgefiltert werden. Findet Nyaa gar nichts, bleibt die Liste einfach leer. Für den normalen Betrieb auf `debug = false` setzen.
 
 Nach jeder Änderung am Code die Versionsnummer in `index.json` erhöhen, sonst übernimmt Hayase die neue Datei nicht.
 
@@ -132,7 +132,7 @@ Hayase checks for newer versions on startup, so after an update it is enough to 
 
 ### For developers
 
-`germandub.js` contains a switch `debug = true`. While it is on, Hayase shows an error message with details when the result is empty (number of feed hits, episode, titles passed in). Set it to `debug = false` for normal use.
+`germandub.js` contains a switch `debug = true`. While it is on, Hayase shows an error message with details (number of feed hits, episode, titles passed in) when Nyaa returns German-looking results but all of them get filtered out. If Nyaa finds nothing at all, the list simply stays empty. Set it to `debug = false` for normal use.
 
 After every code change, increase the version number in `index.json`, otherwise Hayase will not pick up the new file.
 

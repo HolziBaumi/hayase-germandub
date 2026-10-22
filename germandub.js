@@ -12,12 +12,13 @@ export default new class GermanDub {
   subOnly = /\bger(man)?[\s._-]*sub/i
   stop = new Set(['the', 'and', 'for', 'with', 'from', 'season', 'part', 'movie', 'film'])
 
-  // DEBUG: true = bei leerem Ergebnis zeigt Hayase eine Fehlermeldung mit Details.
-  // Wenn alles läuft, auf false setzen.
+  // DEBUG: true = Hayase zeigt eine Fehlermeldung mit Details, wenn Nyaa zwar deutsche
+  // Treffer liefert, aber alle herausgefiltert werden. Findet Nyaa gar nichts, bleibt die
+  // Liste einfach leer. Wenn alles läuft, auf false setzen.
   debug = true
 
   check(mode, query, raw, out) {
-    if (this.debug && !out.length) {
+    if (this.debug && raw.length > 0 && !out.length) {
       throw new Error(
         `[GerDub-Debug] ${mode}: Feed-Treffer=${raw.length}, nach Filter=0, ` +
         `Episode=${query.episode}, Titel=${JSON.stringify(query.titles)}, ` +
