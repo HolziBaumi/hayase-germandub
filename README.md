@@ -2,7 +2,7 @@
 
 **Sprache / Language:** [Deutsch](#deutsch) · [English](#english)
 
-**Autor / Author:** HolzI_Baumi
+**Autor / Author:** Holzi_Baumi
 
 ---
 
