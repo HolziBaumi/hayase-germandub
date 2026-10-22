@@ -10,7 +10,7 @@
 
 Eine Extension für [Hayase](https://github.com/hayase-app), die auf Nyaa nach **deutscher Synchro** (German Dub) für Anime sucht und die Treffer direkt in der Torrent-Auswahl von Hayase anzeigt.
 
-> **Status:** läuft, wird aber noch weiter getestet. Einzelne Funktionen können sich ändern.
+> **Status: Beta.** Die Extension läuft und findet deutsche Releases, wird aber noch getestet. Einzelne Funktionen können sich ändern.
 
 ### Installation
 
@@ -81,7 +81,7 @@ Fehler und Vorschläge gerne als [Issue](https://github.com/HolziBaumi/hayase-ge
 
 An extension for [Hayase](https://github.com/hayase-app) that searches Nyaa for **German-dubbed** anime and shows the results directly in Hayase's torrent picker.
 
-> **Status:** working, but still being tested. Some features may change.
+> **Status: Beta.** The extension works and finds German releases, but is still being tested. Some features may change.
 
 ### Installation
 
