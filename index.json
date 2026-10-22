@@ -4,7 +4,7 @@
     "name": "German Dub (Nyaa)",
     "author": "Holzi_Baumi",
     "id": "community.extension.germandub",
-    "version": "1.0.14",
+    "version": "1.0.15",
     "type": "torrent",
     "accuracy": "medium",
     "updatePeers": false,

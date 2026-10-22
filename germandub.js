@@ -150,7 +150,7 @@ export default new class GermanDub {
 
     for (const item of items) {
       const title = this.decode(tag(item, 'title').replace(/<!\[CDATA\[|\]\]>/g, ''))
-      if (!this.dubRegex.test(title) || (this.subOnly.test(title) && !/dub/i.test(title))) continue
+      if (!this.dubRegex.test(title) || this.isSubOnly(title)) continue
 
       const hash = tag(item, 'nyaa:infoHash').toLowerCase()
       if (!hash) continue
@@ -169,6 +169,16 @@ export default new class GermanDub {
       })
     }
     return out
+  }
+
+  // Nur deutsche Untertitel? Dann kein Dub. Erkennt "Ger Sub", "Multiple Subtitle ... [GER]",
+  // Gruppen wie "Ecchi-Subs" usw. Steht aber ein Dub-Hinweis im Titel, bleibt der Treffer drin.
+  dubWords = /(dub|dubbed|deutsch|synchro|multi[\s._-]*audio|dual[\s._-]*audio|\bdl\b)/i
+  subHints = /(multi(?:ple)?[\s._-]*sub|subtitle|\bsubs?\b|\[eng\])/i
+
+  isSubOnly(title) {
+    if (this.subOnly.test(title) && !/dub/i.test(title)) return true
+    return this.subHints.test(title) && !this.dubWords.test(title)
   }
 
   // Hayase zeigt über dem Titel den Release-Gruppennamen an (z. B. "IK", "Judas").
