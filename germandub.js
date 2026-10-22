@@ -12,17 +12,17 @@ export default new class GermanDub {
   subOnly = /\bger(man)?[\s._-]*sub/i
   stop = new Set(['the', 'and', 'for', 'with', 'from', 'season', 'part', 'movie', 'film'])
 
-  // DEBUG: true = Hayase zeigt eine Fehlermeldung mit Details, wenn Nyaa zwar deutsche
-  // Treffer liefert, aber alle herausgefiltert werden. Findet Nyaa gar nichts, bleibt die
-  // Liste einfach leer. Wenn alles läuft, auf false setzen.
+  // DEBUG: true = Hayase zeigt bei leerem Ergebnis eine Fehlermeldung mit Details
+  // (Anfrage-Protokoll, Titel, Folge). Wenn alles läuft, auf false setzen.
   debug = true
+  diag = []
 
   check(mode, query, raw, out) {
-    if (this.debug && raw.length > 0 && !out.length) {
+    if (this.debug && !out.length) {
       throw new Error(
         `[GerDub-Debug] ${mode}: Feed-Treffer=${raw.length}, nach Filter=0, ` +
-        `Episode=${query.episode}, Titel=${JSON.stringify(query.titles)}, ` +
-        `Felder=${Object.keys(query || {}).join(',')}`
+        `Episode=${query.episode}, Titel=${JSON.stringify(query.titles)} | ` +
+        `Anfragen: ${this.diag.join(' ;; ') || 'keine'}`
       )
     }
     return out
@@ -59,6 +59,7 @@ export default new class GermanDub {
 
   async searchAll(titles, episode, resolution) {
     if (!titles?.length) return []
+    this.diag = []
     const results = []
     let lastError = null
 
@@ -100,13 +101,19 @@ export default new class GermanDub {
 
   async fetchFeed(query) {
     const hit = this.cache.get(query)
-    if (hit && Date.now() - hit.time < 5 * 60 * 1000) return hit.items
+    if (hit && Date.now() - hit.time < 5 * 60 * 1000) {
+      this.diag.push(`"${query}" cache items=${hit.items.length}`)
+      return hit.items
+    }
 
     for (let attempt = 0; ; attempt++) {
       let res
       try {
         res = await fetch(this.base + encodeURIComponent(query), {
-          headers: { Accept: 'application/xml, text/xml, */*' }
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            Accept: 'application/xml, text/xml, text/html, application/json, */*'
+          }
         })
       } catch (e) {
         throw new Error('nyaa.si ist gerade nicht erreichbar.')
@@ -124,7 +131,13 @@ export default new class GermanDub {
       if (!res.ok) throw new Error('nyaa.si antwortet mit HTTP ' + res.status)
 
       const text = await res.text()
-      const items = text.includes('<item>') ? this.parse(text) : []
+      if (!text.includes('<rss') && !text.includes('<item>')) {
+        const snippet = text.replace(/\s+/g, ' ').slice(0, 80)
+        throw new Error('nyaa.si hat keine Feed-Daten geliefert (vermutlich eine Schutzseite). Kurz warten und erneut versuchen. Anfang der Antwort: ' + snippet)
+      }
+      const total = (text.match(/<item>/g) || []).length
+      const items = this.parse(text)
+      this.diag.push(`"${query}" HTTP ${res.status} items=${total} behalten=${items.length}`)
       this.cache.set(query, { time: Date.now(), items })
       return items
     }
