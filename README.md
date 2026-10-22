@@ -10,7 +10,7 @@
 
 Eine Extension für [Hayase](https://github.com/hayase-app), die auf Nyaa nach **deutscher Synchro** (German Dub) für Anime sucht und die Treffer direkt in der Torrent-Auswahl von Hayase anzeigt.
 
-> **Status:** in Entwicklung. Die Extension wird noch getestet, einzelne Funktionen können sich ändern.
+> **Status:** läuft, wird aber noch weiter getestet. Einzelne Funktionen können sich ändern.
 
 ### Installation
 
@@ -50,7 +50,7 @@ Hayase prüft beim Start automatisch, ob es eine neuere Version gibt. Nach einem
 | „Outdated“ bei der Extension | Hayase neu starten. Hilft das nicht, Extension entfernen und den Repository-Link neu importieren. |
 | `nyaa.si antwortet mit HTTP 429` | Nyaa bremst zu viele Anfragen. Etwa eine Minute warten und die Folge erneut öffnen. Andere Nyaa-Extensions testweise ausschalten. |
 | Keine Treffer | Prüfen, ob für die Serie ein deutscher Release auf Nyaa existiert, und den Test mit einem Anime wiederholen, für den es einen gibt (z. B. Solo Leveling). |
-| Fehlermeldung mit `[GerDub-Debug]` | Der Debug-Modus ist an (siehe unten). Den Text der Meldung bitte mit einem Issue melden. |
+| Fehlermeldung mit `[GerDub-Debug]` | Der Debug-Modus ist an (siehe unten). In `germandub.js` `debug = false` setzen oder den Text der Meldung als Issue melden. |
 
 ### Dateien
 
@@ -61,7 +61,7 @@ Hayase prüft beim Start automatisch, ob es eine neuere Version gibt. Nach einem
 
 ### Für Entwickler
 
-In `germandub.js` gibt es den Schalter `debug = true`. Solange er an ist, zeigt Hayase bei einem leeren Ergebnis eine Fehlermeldung mit Details (Anfrage-Protokoll, Folge, übergebene Titel). Für den normalen Betrieb auf `debug = false` setzen, dann bleibt die Liste bei fehlenden Releases einfach leer.
+In `germandub.js` gibt es den Schalter `debug` (standardmäßig `false`). Solange er an ist, zeigt Hayase bei einem leeren Ergebnis eine Fehlermeldung mit Details (Anfrage-Protokoll, Folge, übergebene Titel). Bei `debug = false` bleibt die Liste bei fehlenden Releases einfach leer. Zum Fehlersuchen auf `debug = true` setzen.
 
 Nach jeder Änderung am Code die Versionsnummer in `index.json` erhöhen, sonst übernimmt Hayase die neue Datei nicht.
 
@@ -81,7 +81,7 @@ Fehler und Vorschläge gerne als [Issue](https://github.com/HolziBaumi/hayase-ge
 
 An extension for [Hayase](https://github.com/hayase-app) that searches Nyaa for **German-dubbed** anime and shows the results directly in Hayase's torrent picker.
 
-> **Status:** work in progress. The extension is still being tested and some features may change.
+> **Status:** working, but still being tested. Some features may change.
 
 ### Installation
 
@@ -121,7 +121,7 @@ Hayase checks for newer versions on startup, so after an update it is enough to 
 | "Outdated" label on the extension | Restart Hayase. If that does not help, remove the extension and re-import the repository link. |
 | `nyaa.si antwortet mit HTTP 429` | Nyaa is rate-limiting requests. Wait about a minute and open the episode again. Try disabling other Nyaa extensions. |
 | No results | Check whether a German release for the series exists on Nyaa, and repeat the test with an anime that has one (e.g. Solo Leveling). |
-| Error message containing `[GerDub-Debug]` | Debug mode is on (see below). Please report the message text in an issue. |
+| Error message containing `[GerDub-Debug]` | Debug mode is on (see below). Set `debug = false` in `germandub.js` or report the message text in an issue. |
 
 ### Files
 
@@ -132,7 +132,7 @@ Hayase checks for newer versions on startup, so after an update it is enough to 
 
 ### For developers
 
-`germandub.js` contains a switch `debug = true`. While it is on, Hayase shows an error message with details (request log, episode, titles passed in) when the result is empty. Set it to `debug = false` for normal use, then the list simply stays empty when no release exists.
+`germandub.js` contains a switch `debug` (default `false`). While it is on, Hayase shows an error message with details (request log, episode, titles passed in) when the result is empty. With `debug = false` the list simply stays empty when no release exists. Set it to `debug = true` when troubleshooting.
 
 After every code change, increase the version number in `index.json`, otherwise Hayase will not pick up the new file.
 

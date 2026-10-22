@@ -14,7 +14,7 @@ export default new class GermanDub {
 
   // DEBUG: true = Hayase zeigt bei leerem Ergebnis eine Fehlermeldung mit Details
   // (Anfrage-Protokoll, Titel, Folge). Wenn alles läuft, auf false setzen.
-  debug = true
+  debug = false
   diag = []
 
   check(mode, query, raw, out) {
